@@ -1,7 +1,22 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+    {% if watchlist == True %}
+    <h2>Watchlist</h2>
+    {% else %}
     <h2>Active Listings</h2>
+    {% endif %}
 
-    TODO
+    {% for listing in listings %}
+        <a href="listing/{{ listing.id }}">
+            <h4> Listing:&nbsp {{ listing.title }}  </h4>
+            <img src={{ listing.imageURL }} >
+            <h6> {{ listing.description }} </h6>
+        </a>
+        <h5> Current Bid: ${{ listing.price }}</h5>
+        <br>
+        <br>
+        <br>
+    {% endfor %}
+
 {% endblock %}
