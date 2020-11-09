@@ -1,0 +1,75 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h3>Listing: &nbsp {{ item.title }}</h3>
+    <h6>Category: &nbsp {{category.category}} </h6>
+    <br>
+
+
+
+    <img src={{ item.imageURL }} >
+    <h6> {{ item.description }} </h6>
+    <br>
+    <h5> Price: ${{ item.price }}</h5>
+    <p> {{ bids_sentence }} {{ yourbid }}</p>
+
+
+    <form action="{% url 'new_bid' %}" method="post">
+        {% csrf_token %}
+        $<input type="number" step="0.01" name="new_bid" placeholder="Bid" min="{{ min_newbid }}" >
+        <input type="hidden" name="id" value="{{ item.id }}">
+        <input class="button" type="submit" value="Place Bid">
+    </form>
+
+    <br>
+
+    {% if logged_in == True %}
+        <form action="{% url 'watchlist' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="id" value="{{ item.id }}">
+
+            {% if on_Watchlist == False %}
+                <input type="hidden" name="add_remove" value="Add">
+                <button>Add to Watchlist</button>
+
+            {% else %}
+                <input type="hidden" name="add_remove" value="Remove">
+                <p> You are watching this item.</p>
+                <button>Remove from Watchlist</button>
+            {% endif %}
+
+        </form>
+    {% endif %}
+
+    <br>
+    <h6> Listed By: {{item.listed_by}}</h6></p>
+
+    {% if creator == True %}
+    <form>
+        {% csrf_token %}
+        <button>End Auction</button>
+    </form>
+    {% endif %}
+
+    <br>
+
+    <h5> Comments </h5>
+
+    <form action="{% url 'comment' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="hidden" name="id" value="{{ item.id }}">
+        <br>
+        <button>Add Comment</button>
+    </form>
+
+    <br>
+
+    {% for comment in comments %}
+        <p><b> {{ comment.commenter }} </b> <em>{{ comment.time_commented }}</em></p>
+        <p> {{ comment.comment }} </p>
+
+    {% endfor %}
+
+
+{% endblock %}
