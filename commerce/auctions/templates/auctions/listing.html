@@ -13,13 +13,16 @@
     <h5> Price: ${{ item.price }}</h5>
     <p> {{ bids_sentence }} {{ yourbid }}</p>
 
-
-    <form action="{% url 'new_bid' %}" method="post">
-        {% csrf_token %}
-        $<input type="number" step="0.01" name="new_bid" placeholder="Bid" min="{{ min_newbid }}" >
-        <input type="hidden" name="id" value="{{ item.id }}">
-        <input class="button" type="submit" value="Place Bid">
-    </form>
+    {% if item.active == True %}
+        <form action="{% url 'new_bid' %}" method="post">
+            {% csrf_token %}
+            $<input type="number" step="0.01" name="new_bid" placeholder="Bid" min="{{ min_newbid }}" >
+            <input type="hidden" name="id" value="{{ item.id }}">
+            <input class="button" type="submit" value="Place Bid">
+        </form>
+    {% else %}
+        <h5>This Auction has finished!</h5>
+    {% endif %}
 
     <br>
 
@@ -44,11 +47,12 @@
     <br>
     <h6> Listed By: {{item.listed_by}}</h6></p>
 
-    {% if creator == True %}
-    <form>
-        {% csrf_token %}
+    {% if creator == True and item.active == True %}
+        <form action="{% url 'end_auction' %}" method="post">
+            {% csrf_token %}
+        <input type="hidden" name="id" value="{{ item.id }}">
         <button>End Auction</button>
-    </form>
+        </form>
     {% endif %}
 
     <br>

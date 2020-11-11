@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django import forms
 
-from .models import User, Listing, Category, Bids, Comments, Watchlist
+from .models import User, Listing, Category, Bid, Comment, Watchlist
 
 class CreateListing(forms.Form):
     """ Django Form to Create a new Listing"""
@@ -36,19 +36,39 @@ class NewComment(forms.Form):
 
 
 def index(request):
+    # set filters to False so that we see the full active list
     watchlist = False
+    categorylist = False
+
+
     listings = Listing.objects.all().order_by('-id')
     return render(request, "auctions/index.html", {
         "listings": listings,
-        "watchlist": watchlist
+        "watchlist": watchlist,
+        "categorylist": categorylist
     })
 
 
 
 def categories(request):
     if request.method == "POST":
-        print("HERE")
-        return redirect('/')
+        # determine category selected
+        category = request.POST.get('category')
+
+        # need to render a html page that shows only the listings on for the category.
+        watchlist = False
+        categorylist = True
+
+        # retrieve listings for selected Category only
+        category_data = Category.objects.get(category=category)
+
+        listings = Listing.objects.filter(category=category_data.id).order_by('-id')
+
+        return render(request, "auctions/index.html", {
+            "listings": listings,
+            "watchlist": watchlist,
+            "categorylist": categorylist
+        })
 
     else:
         # need to render a html page that shows a hyperlinked list of categories.
@@ -73,7 +93,7 @@ def comment(request):
         commenter = request.user.username
 
         # save new Comment to database
-        newComment = Comments(comment=comment, commenter=commenter, listing_id=listing_id)
+        newComment = Comment(comment=comment, commenter=commenter, listing_id=listing_id)
         newComment.save()
 
     # reload Listing (showing new comment)
@@ -117,9 +137,24 @@ def create(request):
     return redirect('/')
 
 
+
+def end_auction(request):
+    listing_id = request.POST.get('id')
+    print(listing_id)
+
+    item = Listing.objects.get(id=listing_id)
+    item.active = False
+    item.save()
+
+    # Redirect to Listing Page so that user can see their new listing.
+    redirectURL = 'listing/' + str(listing_id)
+    return redirect(redirectURL)
+
+
 def list_item(request, item):
     """ retrieve item from database using unique id """
     item_entry = Listing.objects.get(id=int(item))
+    print(item_entry)
 
     #initialise variables
     yourbid = ""
@@ -142,10 +177,12 @@ def list_item(request, item):
 
         # determine if current user is highest bidder
         if(item_entry.num_bids > 0):
-            highest = Bids.objects.filter(listing_id=item).order_by('bid')[0]
+            highest = Bid.objects.filter(listing_id=item).order_by('bid')[0]
 
-            if (highest.bidder == username):
+            if (highest.bidder == username and item_entry.active == True):
                 yourbid = "Your bid is the current bid."
+            elif (highest.bidder == username and item_entry.active == False):
+                yourbid = "You won this item! Your bid was successful!"
             else:
                 yourbid = ""
         else:
@@ -169,7 +206,7 @@ def list_item(request, item):
     form = NewComment()
 
     # retrieve all Comments
-    comments = Comments.objects.filter(listing_id=item)
+    comments = Comment.objects.filter(listing_id=item)
 
     # determine whether user has already added item to their watchlist
     if logged_in == True:
@@ -235,13 +272,13 @@ def new_bid(request):
         listing.save(update_fields=['price','num_bids'])
 
 
-        # store bid in Bids table
+        # store bid in Bid table
         bidder = request.user.username
-        bid_details = Bids(bid=bid, bidder=bidder, listing_id=listing_id)
+        bid_details = Bid(bid=bid, bidder=bidder, listing_id=listing_id)
         bid_details.save()
 
         #reload listing page showing new price
-        redirectURL = '/' + str(listing_id)
+        redirectURL = 'listing/' + str(listing_id)
         return redirect(redirectURL)
 
     return render(request, "auctions/index.html")
@@ -301,6 +338,7 @@ def watchlist(request):
     else:
         # need to render a html page that shows only the listings on the watchlist.
         watchlist = True
+        categorylist = False
 
         #retrieve username
         user = request.user.username
@@ -308,16 +346,13 @@ def watchlist(request):
         # retrieve listings for items on Watchlist
         watchlist_ids = []
         items_onlist = Watchlist.objects.filter(user=user)
-        print(items_onlist)
         for list_item in items_onlist:
             watchlist_ids.append(list_item.listing_id)
-            print(watchlist_ids)
 
         listings = Listing.objects.filter(id__in=watchlist_ids).order_by('-id')
 
-        print(listings)
-
         return render(request, "auctions/index.html", {
             "listings": listings,
-            "watchlist": watchlist
+            "watchlist": watchlist,
+            "categorylist": categorylist
         })

@@ -3,11 +3,14 @@
 {% block body %}
 
     <h2>Categories</h2>
+    <br>
 
     <form action="{% url 'categories' %}" method="post">
     {% csrf_token %}
     {% for category in categories %}
             <input type="submit" name="category" value="{{ category.category }}">
+            <br>
+            <br>
     {% endfor %}
     </form>
 

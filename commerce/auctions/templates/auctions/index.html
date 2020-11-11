@@ -3,6 +3,8 @@
 {% block body %}
     {% if watchlist == True %}
     <h2>Watchlist</h2>
+    {% elif categorylist == True %}
+    <h2>{{ category }} Listings</h2>
     {% else %}
     <h2>Active Listings</h2>
     {% endif %}

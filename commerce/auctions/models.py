@@ -7,9 +7,12 @@ from django.db import models
 
 
 class Category(models.Model):
+    class Meta:
+        verbose_name_plural = "categories"
     category = models.CharField(max_length=64)
 
-
+    def __str__(self):
+        return f"{self.category}"
 
 
 class Listing(models.Model):
@@ -34,27 +37,39 @@ class Listing(models.Model):
         choices = CATEGORY_CHOICES,
         default = 999
     )
+    active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.id}: {self.title} listed by {self.listed_by}"
+        return f"{self.title} listed by {self.listed_by}"
 
 
-class Bids(models.Model):
+class Bid(models.Model):
     time_bid = models.DateTimeField(auto_now_add=True)
     bid = models.DecimalField(max_digits=8, decimal_places=2)
     bidder = models.CharField(max_length=64)
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f"Bid of ${self.bid} made by {self.bidder} on {self.listing} at {self.time_bid}"
 
-class Comments(models.Model):
+
+
+class Comment(models.Model):
     time_commented = models.DateTimeField(auto_now_add=True)
     comment = models.TextField()
     commenter = models.CharField(max_length=64)
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f"Comment made by {self.commenter} on item {self.listing} at {self.time_commented}"
+
 class Watchlist(models.Model):
     user = models.CharField(max_length=64)
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user}'s Watchlist includes item {self.listing}"
+
 
 class User(AbstractUser):
     pass
