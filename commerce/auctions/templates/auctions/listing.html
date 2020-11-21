@@ -1,79 +1,128 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h3>Listing: &nbsp {{ item.title }}</h3>
-    <h6>Category: &nbsp {{category.category}} </h6>
-    <br>
 
+<!--Main Page Heading-->
+<div class="col-12 text-center mt-5">
+    <h3 class="text-dark pt-4">Listing: &nbsp {{ item.title }}</h3>
+    <h6 class="text-dark pt-4">Category: &nbsp {{category.category}} </h6>
+    <div class="divider border-top border-primary w-25 mx-auto my-3"></div>
+</div>
 
+<!--End Main Page Heading-->
 
-    <img src={{ item.imageURL }} >
-    <h6> {{ item.description }} </h6>
-    <br>
-    <h5> Price: ${{ item.price }}</h5>
-    <p> {{ bids_sentence }} {{ yourbid }}</p>
+<!-- Listing Detail -->
+<div class="container">
+    <div class="row my-3">
+        <div class="col-md-2"></div>
 
-    {% if item.active == True %}
-        <form action="{% url 'new_bid' %}" method="post">
-            {% csrf_token %}
-            $<input type="number" step="0.01" name="new_bid" placeholder="Bid" min="{{ min_newbid }}" >
-            <input type="hidden" name="id" value="{{ item.id }}">
-            <input class="button" type="submit" value="Place Bid">
-        </form>
-    {% else %}
-        <h5>This Auction has finished!</h5>
-    {% endif %}
+        <div class="col-md-8 my-4 text-center">
 
-    <br>
-
-    {% if logged_in == True %}
-        <form action="{% url 'watchlist' %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="id" value="{{ item.id }}">
-
-            {% if on_Watchlist == False %}
-                <input type="hidden" name="add_remove" value="Add">
-                <button>Add to Watchlist</button>
-
+            {% if item.imageURL != "" %}
+            <img class="w-100 h-50 pb-3" src={{ item.imageURL }} >
             {% else %}
-                <input type="hidden" name="add_remove" value="Remove">
-                <p> You are watching this item.</p>
-                <button>Remove from Watchlist</button>
+            <img class="w-100 h-50 p-5 " src="data:image/png;base64,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" >
             {% endif %}
 
-        </form>
-    {% endif %}
+            <h6> {{ item.description }} </h6>
+            <br>
+            <h5> Price: ${{ item.price }}</h5>
+            <p class="m-1"> {{ bids_sentence }} </p>
+            <p class="m-2 mb-4"> {{ yourbid }} </p>
 
-    <br>
-    <h6> Listed By: {{item.listed_by}}</h6></p>
+            {% if item.active == True %}
+                <form action="{% url 'new_bid' %}" method="post">
+                    {% csrf_token %}
+                    $<input type="number" step="0.01" name="new_bid" placeholder="Bid" min="{{ min_newbid }}" >
+                    <input type="hidden" name="id" value="{{ item.id }}">
+                    <input class="btn btn-info btn-sm" type="submit" value="Place Bid">
+                </form>
+            {% else %}
+                <h5>This Auction has finished!</h5>
+            {% endif %}
 
-    {% if creator == True and item.active == True %}
-        <form action="{% url 'end_auction' %}" method="post">
-            {% csrf_token %}
-        <input type="hidden" name="id" value="{{ item.id }}">
-        <button>End Auction</button>
-        </form>
-    {% endif %}
+            <br>
 
-    <br>
+            {% if logged_in == True %}
+                <form action="{% url 'watchlist' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{ item.id }}">
 
-    <h5> Comments </h5>
+                    {% if on_Watchlist == False %}
+                        <input type="hidden" name="add_remove" value="Add">
+                        <button class="btn btn-info btn-md">Add to Watchlist</button>
 
-    <form action="{% url 'comment' %}" method="post">
-        {% csrf_token %}
-        {{ form }}
-        <input type="hidden" name="id" value="{{ item.id }}">
+                    {% else %}
+                        <input type="hidden" name="add_remove" value="Remove">
+                        <p> You are watching this item.</p>
+                        <button class="btn btn-info btn-md">Remove from Watchlist</button>
+                    {% endif %}
+
+                </form>
+            {% endif %}
+
+            <br>
+            <h6> Listed By: {{item.listed_by}}</h6></p>
+
+            {% if creator == True and item.active == True %}
+            <form action="{% url 'end_auction' %}" method="post">
+                {% csrf_token %}
+            <input type="hidden" name="id" value="{{ item.id }}">
+            <button class="btn btn-info btn-md">End Auction</button>
+            </form>
+            {% endif %}
+
         <br>
-        <button>Add Comment</button>
-    </form>
 
-    <br>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
 
-    {% for comment in comments %}
-        <p><b> {{ comment.commenter }} </b> <em>{{ comment.time_commented }}</em></p>
-        <p> {{ comment.comment }} </p>
+    <!-- End Listing Detail -->
 
-    {% endfor %}
 
+    <!-- Comments -->
+
+<div class="col-12 text-center mt-5">
+    <h4 class="text-dark pt-4">Comments</h4>
+    <div class="divider border-top border-primary w-25 mx-auto my-3"></div>
+</div>
+
+<div class="container">
+    <div class="row my-3">
+        <div class="col-md-2"></div>
+
+        <div class="col-md-8 my-4 text-center">
+
+            {% for comment in comments %}
+                <div class="rounded border border-secondary bg-light p-2 m-2">
+                    <p><b> {{ comment.commenter }} </b> <em>{{ comment.time_commented }}</em></p>
+                    <p> {{ comment.comment }} </p>
+                </div>
+            {% endfor %}
+
+
+            <form class="mt-5" action="{% url 'comment' %}" method="post">
+                {% csrf_token %}
+                {{ form }}
+                <input type="hidden" name="id" value="{{ item.id }}">
+                <br>
+                <button class="btn btn-secondary btn-sm">Add Comment</button>
+            </form>
+
+
+
+
+
+        <div class="col-md-2"></div>
+    </div>
+</div>
+
+<br>
+
+
+
+    <!-- End Comments -->
 
 {% endblock %}

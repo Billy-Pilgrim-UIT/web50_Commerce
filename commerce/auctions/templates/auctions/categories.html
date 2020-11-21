@@ -2,16 +2,47 @@
 
 {% block body %}
 
-    <h2>Categories</h2>
-    <br>
+    <!--Main Page Heading-->
+    <div class="container mt-5">
+        <h2>Categories</h2>
+        <div class="divider border-top border-primary w-25 mx-0 my-3"></div>
+    </div>
 
-    <form action="{% url 'categories' %}" method="post">
-    {% csrf_token %}
-    {% for category in categories %}
-            <input type="submit" name="category" value="{{ category.category }}">
-            <br>
-            <br>
-    {% endfor %}
-    </form>
+    <!--End Main Page Heading-->
+
+    <!-- Categories -->
+
+    <div class="container">
+
+        <div class="row">
+
+
+            <form action="{% url 'categories' %}" method="post">
+                {% csrf_token %}
+                {% for category in categories %}
+                <div class="spacing form-group">
+                    <input class="btn btn-info btn-md" type="submit" name="category" value="{{ category.category }}">
+                </div>
+                {% endfor %}
+            </form>
+
+
+
+
+        </div>
+    </div>
+
+
+        <br>
+        <br>
+        <br>
+
+
+    <!-- Categories -->
+
+
+
+
+
 
 {% endblock %}

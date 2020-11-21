@@ -1,24 +1,56 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    {% if watchlist == True %}
-    <h2>Watchlist</h2>
-    {% elif categorylist == True %}
-    <h2>{{ category }} Listings</h2>
-    {% else %}
-    <h2>Active Listings</h2>
-    {% endif %}
 
-    {% for listing in listings %}
-        <a href="listing/{{ listing.id }}">
-            <h4> Listing:&nbsp {{ listing.title }}  </h4>
-            <img src={{ listing.imageURL }} >
-            <h6> {{ listing.description }} </h6>
-        </a>
-        <h5> Current Bid: ${{ listing.price }}</h5>
+    <!--Main Page Heading-->
+    <div class="col-12 text-center mt-5">
+        <h2 class="text-dark pt-4">
+            {% if watchlist == True %}
+            Watchlist
+            {% elif categorylist == True %}
+            {{ category }} Listings
+            {% else %}
+            Active Listings
+            {% endif %}
+        </h2>
+        <div class="divider border-top border-primary w-25 mx-auto my-3"></div>
+    </div>
+
+    <!--End Main Page Heading-->
+
+    <!-- Listings -->
+
+    <div class="container">
+        <div class="row my-5">
+
+            {% for listing in listings %}
+            <div class="col-md-4 my-4 text-center">
+                <a class="list-anchor" href="listing/{{ listing.id }}">
+                    <h4 class="my-4"> {{ listing.title }}  </h4>
+                    {% if listing.imageURL != "" %}
+                        <img class="w-100 h-50 pb-3" src={{ listing.imageURL }} >
+                    {% else %}
+                        <img class="w-100 h-50 p-5 " src="data:image/png;base64,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" >
+                    {% endif %}
+                    <h6 class="list-height"> {{ listing.description }} </h6>
+                </a>
+                <h5> Current Bid: ${{ listing.price }}</h5>
+                <a href="listing/{{ listing.id }}" class="btn btn-outline-dark btn-md">Full Listing</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
         <br>
         <br>
         <br>
-    {% endfor %}
+
+
+    <!-- End Listings -->
 
 {% endblock %}
+
+
+
+

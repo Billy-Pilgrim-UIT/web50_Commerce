@@ -3,54 +3,113 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>{% block title %}The Trading Post{% endblock %}</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link rel="shortcut icon" href="{% static 'images/favicon.png' %}">
+        <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"> -->
+        <link href="{% static 'auctions/bootstrap.css' %}" rel="stylesheet">
         <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap" rel="stylesheet">
     </head>
     <body>
-        <h1>The Trading Post</h1>
-        <div>
-            {% if user.is_authenticated %}
-                Signed in as <strong>{{ user.username }}</strong>.
-            {% else %}
-                Not signed in.
-            {% endif %}
+
+        <!--Top Bar -->
+        <div class="top-bar">
+            <div class="container">
+                <div class="col-12 text-right">
+                    <p>
+                    {% if user.is_authenticated %}
+                        Signed in as <strong>{{ user.username }}</strong>.
+                    {% else %}
+                        Not signed in.&nbsp<a href="{% url 'login' %}">Sign In</a>
+                    {% endif %}
+                    </p>
+                </div>
+            </div>
         </div>
-        <ul class="nav">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
-            </li>
+        <!--End Top Bar -->
 
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'categories' %}">Categories</a>
-            </li>
+        <!--Navigation Bar-->
 
-            {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'watchlist' %}">Watchlist</a>
-                </li>
+        <nav class="navbar bg-light navbar-light navbar-expand-lg">
+            <div class="container">
 
+                <h1 class="logo"><a href="{% url 'index' %}" class="nav">The Trading Post</a></h1>
+
+                <button class="navbar-toggler" type="button" data-toggle="collapse"  data-target="#navbarResponsive">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'create' %}">Create a Listing</a>
-                </li>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'categories' %}">Categories</a>
+                        </li>
+
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'watchlist' %}">Watchlist</a>
+                            </li>
 
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
-                </li>
-            {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Log In</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">Register</a>
-                </li>
-            {% endif %}
-        </ul>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'create' %}">Create a Listing</a>
+                            </li>
+
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'register' %}">Register</a>
+                            </li>
+                        {% endif %}
+
+
+                    </ul>
+
+                </div>
+
+
+            </div>
+        </nav>
+
         <hr>
+
+        <!--End Navigation Bar-->
+
         {% block body %}
         {% endblock %}
+
+
+        <!-- Space at bottom of page-->
+        <div class="container my-5"></div>
+
+        <!-- Script Source Files -->
+
+        <!-- jQuery -->
+        <script src="{% static 'js/jquery-3.5.1.min.js' %}"></script>
+        <!-- Bootstrap 4.5 JS -->
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+        <!-- Popper JS -->
+        <script src="{% static 'js/popper.min.js' %}"></script>
+        <!-- Font Awesome -->
+        <script src="{% static 'js/all.min.js' %}"></script>
+
+        <!-- End Script Source Files -->
     </body>
 </html>

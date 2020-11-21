@@ -9,10 +9,10 @@ from .models import User, Listing, Category, Bid, Comment, Watchlist
 
 class CreateListing(forms.Form):
     """ Django Form to Create a new Listing"""
-    title = forms.CharField(label="Give your listing a descriptive title:")
-    description = forms.CharField(label="Item Description:", widget=forms.Textarea,)
-    startingbid = forms.DecimalField(label="Starting Bid: $", decimal_places=2)
-    imageURL = forms.URLField(label="Image URL:", required=False)
+    title = forms.CharField(label="Give your listing a descriptive title:", widget=forms.TextInput(attrs={'class': 'form-control'}),)
+    description = forms.CharField(label="Item Description:", widget=forms.Textarea(attrs={'class': 'form-control'}),)
+    startingbid = forms.DecimalField(label="Starting Bid: $", decimal_places=2, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    imageURL = forms.URLField(label="Image URL:", required=False, widget=forms.URLInput(attrs={'class': 'form-control'}), )
 
     # retrieving list of categories and storing in a list of tuples.
     categories = Category.objects.all()
@@ -22,7 +22,7 @@ class CreateListing(forms.Form):
         cat_tuple = (category.id, category.category)
         CHOICES.append(cat_tuple)
 
-    category = forms.ChoiceField(widget=forms.RadioSelect,
+    category = forms.ChoiceField(widget=forms.RadioSelect(attrs={"id":"category-list"}),
         choices = CHOICES,
         initial = 'No Category Specified'
     )
@@ -31,7 +31,7 @@ class CreateListing(forms.Form):
 
 class NewComment(forms.Form):
     """ Django Form to Add a NewComment """
-    comment = forms.CharField(label="Add a Public Comment:", widget=forms.Textarea,)
+    comment = forms.CharField(label="Add a Public Comment:", widget=forms.Textarea(attrs={'class': 'form-control'}),)
 
 
 
@@ -41,7 +41,7 @@ def index(request):
     categorylist = False
 
 
-    listings = Listing.objects.all().order_by('-id')
+    listings = Listing.objects.filter(active=True).order_by('-id')
     return render(request, "auctions/index.html", {
         "listings": listings,
         "watchlist": watchlist,
@@ -140,7 +140,6 @@ def create(request):
 
 def end_auction(request):
     listing_id = request.POST.get('id')
-    print(listing_id)
 
     item = Listing.objects.get(id=listing_id)
     item.active = False
@@ -154,7 +153,6 @@ def end_auction(request):
 def list_item(request, item):
     """ retrieve item from database using unique id """
     item_entry = Listing.objects.get(id=int(item))
-    print(item_entry)
 
     #initialise variables
     yourbid = ""
@@ -177,7 +175,8 @@ def list_item(request, item):
 
         # determine if current user is highest bidder
         if(item_entry.num_bids > 0):
-            highest = Bid.objects.filter(listing_id=item).order_by('bid')[0]
+            highest = Bid.objects.filter(listing_id=item).order_by('-bid')[0]
+            print(highest)
 
             if (highest.bidder == username and item_entry.active == True):
                 yourbid = "Your bid is the current bid."
